@@ -3,9 +3,11 @@
     <h2>Default</h2>
 
     <div>
+      <p>size: {{ size }}</p>
       <button @click="fetchMore">
         fetchMore
       </button>
+      <p>length: {{ things.length }}</p>
       <ul>
         <li
           v-for="thing in things"
@@ -26,25 +28,24 @@ export default Vue.extend({
   name: 'DefaultComponent',
   data () {
     return {
-      things: {
-        type: Array,
-        default: []
-      }
+      things: [] as any[],
+      size: 3
     }
   },
   async fetch () {
-    const posts = await this.fetchThings()
+    const posts = await this.fetchThings(this.size)
     this.things = posts
-    console.log('posts >', posts)
+    this.size++
   },
   fetchKey () { return Date.now().toString() },
   methods: {
     async fetchMore () {
-      const posts = await this.fetchThings()
+      const posts: any[] = await this.fetchThings(this.size)
+      this.size++
       this.things = [...(this.things ?? []), ...(posts ?? [])]
     },
-    async fetchThings () {
-      const { data } = await axios.get('https://random-data-api.com/api/users/random_user?size=3')
+    async fetchThings (size = 1) {
+      const { data } = await axios.get(`https://random-data-api.com/api/users/random_user?size=${size}`)
       return data
     }
   }
